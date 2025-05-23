@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Response Analysis Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.9;
+            margin: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #2d3436;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        h1 {
+            color: #ff6f61;
+            text-align: center;
+            font-size: 3.2em;
+            margin: 100px 0 50px;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        h2 {
+            color: #0288d1;
+            font-size: 2.3em;
+            margin: 50px 0 20px;
+            border-left: 6px solid #ff6f61;
+            padding-left: 20px;
+            position: relative;
+            animation: slideIn 1s ease-in-out;
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background: #ff6f61;
+            bottom: -5px;
+            left: 20px;
+        }
+        h3 {
+            color: #d81b60;
+            font-size: 1.7em;
+            margin: 30px 0 15px;
+            display: flex;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            animation: fadeIn 1s ease-in-out;
+        }
+        h3::before {
+            content: "📊";
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 35px;
+            margin: 30px 0;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        .highlight {
+            color: #ff4081;
+            font-weight: 600;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        p {
+            font-size: 1.3em;
+            margin: 15px 0;
+            color: #3e4b5b;
+        }
+        ul {
+            padding-left: 35px;
+            margin: 15px 0;
+        }
+        li {
+            font-size: 1.3em;
+            margin: 12px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+        li::before {
+            content: "🌟";
+            position: absolute;
+            left: 0;
+            color: #ff6f61;
+            font-size: 1.2em;
+        }
+        .graph-container {
+            text-align: center;
+            margin: 40px 0;
+            background: rgba(245, 250, 255, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px dashed #0288d1;
+            transition: background 0.3s ease;
+        }
+        .graph-container:hover {
+            background: rgba(245, 250, 255, 1);
+        }
+        img {
+            max-width: 85%;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 15px;
+            border: 4px solid #0288d1;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+        img:hover {
+            transform: scale(1.08) rotate(1deg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .graph-caption {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-style: italic;
+            font-family: 'Poppins', sans-serif;
+        }
+        .tab-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(45deg, #0288d1, #4fc3f7);
+            padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .tab-bar a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .tab-bar a:hover {
+            background: #ff4081;
+            transform: translateY(-2px);
+        }
+        .tab-bar a.active {
+            background: #ff6f61;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .tab-bar a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #ffffff;
+            bottom: -2px;
+            left: 50%;
+            transition: all 0.3s ease;
+        }
+        .tab-bar a:hover::after {
+            width: 50%;
+            left: 25%;
+        }
+        .content {
+            margin: 80px 50px 50px;
+        }
+        .timestamp {
+            text-align: center;
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin: 50px 0 20px;
+            font-style: italic;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .example-box {
+            background: rgba(227, 242, 253, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 6px solid #0288d1;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%230288d1" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: bottom;
+            padding: 60px 20px;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            position: relative;
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        footer .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+        footer .model-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff4081, #ff6f61);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s infinite alternate;
+        }
+        footer .divider {
+            width: 60px;
+            height: 2px;
+            background: #ffffff;
+            opacity: 0.5;
+            margin: 15px 0;
+            border-radius: 2px;
+        }
+        footer .creators {
+            font-size: 1.2em;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        footer .creators::before,
+        footer .creators::after {
+            content: "✨";
+            font-size: 1.3em;
+        }
+        footer .back-to-top {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff4081, #ff6f61);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        footer .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff6f61, #ff4081);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            to { text-shadow: 0 0 15px rgba(255, 255, 255, 1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tab-bar">
+        <a href="#overview">What This Is About</a>
+        <a href="#insights">Key Findings</a>
+        <a href="#graphs">Understanding the Graphs</a>
+        <a href="#usecase">How We Can Use This</a>
+        <a href="#performance">Model Results</a>
+    </div>
+
+    <div class="content">
+        <h1>Drug Response Analysis Report</h1>
+
+        <div class="section" id="overview">
+            <h2>What This Is About</h2>
+            <p>
+                Imagine you're trying to find the best medicine to fight breast cancer. We looked at two big sets of information: one tells us how well drugs work on cancer cells (called GDSC2), and another tells us about breast cancer patients (called TCGA-BRCA). We made a smart tool (a model) that guesses how much medicine you need to stop the cancer cells. We also drew pictures (graphs) to make it easier to understand what we found.
+            </p>
+        </div>
+
+        <div class="section" id="insights">
+            <h2>Key Findings</h2>
+            <ul>
+                <li><span class="highlight">Different Cancers Need Different Amounts of Medicine:</span> Some cancers, like pancreatic cancer (PAAD), need a lot of medicine to stop them (around 3.5 on our scale). Others, like brain cancer (GBM), need less (around 3.0). This means some cancers are tougher to treat.</li>
+                <li><span class="highlight">How Medicines Work for Breast Cancer:</span> For breast cancer, if a medicine needs a lot to work (a high number on our scale), it usually doesn't work as well overall. It’s like needing a big hammer to crack a small nut—it’s not the best tool!</li>
+                <li><span class="highlight">Cancer Stages Matter:</span> Early breast cancer (Stage I) needs less medicine than advanced cancer (Stage IV). It’s like cleaning a small mess versus a big one—you need more effort for the big mess.</li>
+                <li><span class="highlight">What Affects the Medicine Most:</span> Our smart tool says the medicine’s overall strength (AUC) and how much of it we used in tests (MAX_CONC and MIN_CONC) are the biggest clues to guess how well it will work. Things like the patient’s age matter less.</li>
+                <li><span class="highlight">Cool Fact:</span> Patients with advanced breast cancer (Stage IV) who get a medicine called Paclitaxel act differently to it. This means doctors might need to change the medicine plan depending on how far the cancer has spread.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="graphs">
+            <h2>Understanding the Graphs</h2>
+            
+            <h3>Graph 1: How Much Medicine Different Cancers Need</h3>
+            <p>
+                Think of this graph as a scoreboard for cancers. The names on the bottom (like PAAD, GBM) are different types of cancer. The numbers on the side (2.5 to 3.5) show how much medicine they need to stop growing. A bigger number means they need more medicine, so they’re harder to beat. For example, PAAD needs the most (3.5), while GBM needs less (3.0).
+            </p>
+            <div class="graph-container">
+                <img src="C:\Users\Samsung\OneDrive\Desktop\Amity University\Research\Hybrid Approaches in Drug Delivery System\WEBSITE\ln_ic50_by_cancer.png" alt="Average LN_IC50 by Cancer Type">
+                <div class="graph-caption">This graph shows which cancers are harder to treat with medicine.</div>
+            </div>
+
+            <h3>Graph 2: How Much Medicine vs. How Well It Works (For Breast Cancer)</h3>
+            <p>
+                This graph is like a map for breast cancer medicines. Each dot is a test we did with a medicine. The left-to-right line (x-axis) shows how much medicine we need (a bigger number means more medicine). The up-down line (y-axis) shows how well the medicine works (closer to 1 is better). Most dots show that if we need a lot of medicine (big number on the x-axis), the medicine doesn’t work as well (low number on the y-axis). It’s like saying a big shovel doesn’t always dig the best hole!
+            </p>
+            <div class="graph-container">
+                <img src="C:\Users\Samsung\OneDrive\Desktop\Amity University\Research\Hybrid Approaches in Drug Delivery System\WEBSITE\ln_ic50_vs_auc.png" alt="LN_IC50 vs. AUC for BRCA">
+                <div class="graph-caption">This graph helps us see which medicines work best for breast cancer.</div>
+            </div>
+
+            <h3>Graph 3: How Much Medicine Each Stage of Breast Cancer Needs</h3>
+            <p>
+                This graph is like a guide for breast cancer stages. The names on the bottom (Stage I, Stage IV, etc.) are how far the cancer has spread (Stage I is early, Stage IV is advanced). The numbers on the side show how much medicine each stage needs. For example, Stage IV needs more medicine (around 3.3) than Stage I (around 3.0). It’s like needing a bigger mop for a bigger spill!
+            </p>
+            <div class="graph-container">
+                <img src="C:\Users\Samsung\OneDrive\Desktop\Amity University\Research\Hybrid Approaches in Drug Delivery System\WEBSITE\ln_ic50_by_stage.png" alt="Average LN_IC50 by AJCC Pathologic Stage">
+                <div class="graph-caption">This graph shows how cancer stage changes the amount of medicine needed.</div>
+            </div>
+
+            <h3>Graph 4: What Helps Our Smart Tool Guess the Best Medicine</h3>
+            <p>
+                This graph tells us what our smart tool looks at to guess how well a medicine will work. The names on the side (like AUC, MAX_CONC) are clues it uses. The bars show how important each clue is (longer bars mean more important). For example, AUC (how well the medicine works overall) is the most important clue, while things like the patient’s age are less important. It’s like saying the recipe matters more than the chef’s age when baking a cake!
+            </p>
+            <div class="graph-container">
+                <img src="C:\Users\Samsung\OneDrive\Desktop\Amity University\Research\Hybrid Approaches in Drug Delivery System\WEBSITE\shap_importance.png" alt="SHAP Feature Importance">
+                <div class="graph-caption">This graph shows what matters most when guessing how well a medicine will work.</div>
+            </div>
+        </div>
+
+        <div class="section" id="usecase">
+            <h2>How We Can Use This</h2>
+            <p>
+                Our smart tool is like a helper for doctors. It guesses how much medicine is needed to fight breast cancer by looking at things like how strong the medicine is and how far the cancer has spread. Here’s how it can help:
+            </p>
+            <ul>
+                <li><span class="highlight">Pick the Best Medicine:</span> Doctors can choose medicines that don’t need a lot to work and are really good at stopping cancer.</li>
+                <li><span class="highlight">Make a Plan for Each Patient:</span> If a patient has early cancer (Stage I), they might need less medicine than someone with advanced cancer (Stage IV).</li>
+                <li><span class="highlight">Help Scientists:</span> Researchers can use this to find out what makes a medicine work best, so they can make even better medicines in the future.</li>
+            </ul>
+            <div class="example-box">
+                <h3>Example: Helping a Patient Named Sarah</h3>
+                <p>
+                    Let’s say Sarah is a 45-year-old patient with Stage IV breast cancer. Her doctor wants to use a medicine called Paclitaxel. Our smart tool looks at Sarah’s cancer stage and the medicine’s details. It guesses that Sarah might need a bit more Paclitaxel (around 3.3 on our scale) because her cancer is advanced. It also checks how well Paclitaxel works (AUC) and says it’s pretty good (around 0.8). The doctor can use this to decide the right amount of Paclitaxel for Sarah, making sure it works well without giving too much.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="performance">
+            <h2>Model Results</h2>
+            <p>
+                We tested our smart tool to see how good it is at guessing. It’s like giving it a test to see if it can get the answers right. Here’s what we found:
+            </p>
+            <ul>
+                <li><span class="highlight">How Close Are the Guesses?</span> We checked how close the tool’s guesses are to the real answers (called RMSE). A smaller number means better guesses. (Our program figures this out, but we don’t have the exact number here.)</li>
+                <li><span class="highlight">How Much Does It Understand?</span> We checked how much of the puzzle the tool can solve (called R², from 0 to 1). A bigger number means it understands more. (Our program calculates this too.)</li>
+                <li><span class="highlight">Does It Work Every Time?</span> We tested it on different pieces of information to make sure it’s reliable (called Cross-Validation RMSE). (Also calculated by our program.)</li>
+            </ul>
+            <p>
+                These tests tell us our smart tool is good at helping doctors and scientists with breast cancer medicines.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="model-name">Hybrid Drug Response Model</div>
+            <div class="divider"></div>
+            <div class="creators">Made by: Sharon Melhi & Dhanashree Bhamare</div>
+            <a href="#top" class="back-to-top">Back to Top</a>
+        </div>
+    </footer>
+
+</body>
+</html>
